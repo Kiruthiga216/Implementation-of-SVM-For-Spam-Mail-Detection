@@ -28,41 +28,49 @@ RegisterNumber:212224040160
 */
 
 import pandas as pd
+data=pd.read_csv("spam.csv", encoding='Windows-1252')
+print(data.head())
+
+print(data.shape)
+
+x=data['v2'].values
+y=data['v1'].values
+print(x.shape)
+
+print(y.shape)
+
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2, random_state=0)
+x_train
 
-# Step 1: Load Dataset
-df = pd.read_csv("spam.csv", encoding='latin-1')
-df = df[['v1', 'v2']]           # keep only relevant columns
-df.columns = ['label', 'message']
+print(x_train.shape)
 
-# Step 2: Convert labels to numeric
-df['label'] = df['label'].map({'ham': 0, 'spam': 1})
+from sklearn.feature_extraction.text import CountVectorizer
+cv=CountVectorizer()
+x_train=cv.fit_transform(x_train)
+x_test=cv.transform(x_test)
+from sklearn.svm import SVC
+svc=SVC()
+svc.fit(x_train,y_train)
+y_pred=svc.predict(x_test)
+print("y_pred:\n",y_pred)
 
-# Step 3: Split data
-X_train, X_test, y_train, y_test = train_test_split(df['message'], df['label'], test_size=0.2, random_state=42)
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+acc=accuracy_score(y_test,y_pred)
+print("accuracy:\n",acc)
 
-# Step 4: Text vectorization (TF-IDF)
-vectorizer = TfidfVectorizer(stop_words='english')
-X_train_tfidf = vectorizer.fit_transform(X_train)
-X_test_tfidf = vectorizer.transform(X_test)
+con=confusion_matrix(y_test,y_pred)
+print("confusion_matrix:\n",con)
 
-# Step 5: Train SVM model
-model = LinearSVC()
-model.fit(X_train_tfidf, y_train)
+cl=classification_report(y_test,y_pred)
+print("classification:\n",cl)
 
-# Step 6: Predict and Evaluate
-y_pred = model.predict(X_test_tfidf)
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
-print("Classification Report:\n", classification_report(y_test, y_pred))
+
 ```
 
 ## Output:
 
-<img width="540" height="316" alt="image" src="https://github.com/user-attachments/assets/368ae36e-9c47-43ee-a0af-c4633ddd5a21" />
+<img width="702" height="719" alt="image" src="https://github.com/user-attachments/assets/2c526480-211b-4943-955a-b7a93ac54250" />
 
 
 
